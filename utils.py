@@ -3,15 +3,6 @@
 import cv2 as cv
 import numpy as np
 
-def histogramEqualize(image):
-    image = cv.imread('test_010.jpg')
-
-    image = cv.cvtColor(image, cv.COLOR_BGR2YUV)
-    channels = cv.split(image)
-    cv.equalizeHist(channels[0], channels[0])
-    cv.merge(channels, image)
-    return cv.cvtColor(image, cv.COLOR_YUV2BGR)
-    
 
 def fillHoles(image):
     des = cv.bitwise_not(image)
