@@ -1,5 +1,4 @@
-# Copyright 2019 Adam Szkolny <adamszkolny@gmail.com>. All rights
-# reserved.
+# 2019 Adam Szkolny <adamszkolny@gmail.com>.
 
 import cv2 as cv
 import numpy as np
@@ -7,11 +6,11 @@ import numpy as np
 def histogramEqualize(image):
     image = cv.imread('test_010.jpg')
 
-    image = cv.cvtColor(image, cv.COLOR_BGR2YUV);
-    channels = cv.split(image);
-    cv.equalizeHist(channels[0], channels[0]);
-    cv.merge(channels, image);
-    return cv.cvtColor(image, cv.COLOR_YUV2BGR);
+    image = cv.cvtColor(image, cv.COLOR_BGR2YUV)
+    channels = cv.split(image)
+    cv.equalizeHist(channels[0], channels[0])
+    cv.merge(channels, image)
+    return cv.cvtColor(image, cv.COLOR_YUV2BGR)
     
 
 def fillHoles(image):
@@ -47,3 +46,16 @@ def __reshapeContour2Rect(contour):
     peri = cv.arcLength(contour, True)
     contour = cv.approxPolyDP(contour, 0.02 * peri, True)
     return contour.reshape(4, 2)
+
+
+def findMaxContour(contours):
+    if len(contours) == 0:
+        return None
+    else:
+        maxContourArea = -1
+        maxContour = contours[0]
+        for c in contours:
+            if cv.contourArea(c) > maxContourArea:
+                maxContourArea = cv.contourArea(c)
+                maxContour = c
+        return maxContour

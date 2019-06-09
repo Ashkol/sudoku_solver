@@ -2,6 +2,7 @@
 import cv2 as cv
 import numpy as np
 
+
 class SudokuWarper:
     def __init__(self):
         pass
@@ -21,7 +22,6 @@ class SudokuWarper:
                     maxContour = c
             return maxContour
 
-        
     def __getWarpedImage(self, image, contour):
         peri = cv.arcLength(contour, True)
         contour = cv.approxPolyDP(contour, 0.02 * peri, True)
@@ -55,8 +55,7 @@ class SudokuWarper:
         M = cv.getPerspectiveTransform(rect, dst)
         warp = cv.warpPerspective(image, M, (maxWidth, maxHeight))
         return warp
-        
-        
+
     def warpImage(self, image):
         gray = cv.cvtColor(image, cv.COLOR_BGR2GRAY)
         gray = cv.GaussianBlur(gray, (9, 9), 0)
@@ -64,11 +63,10 @@ class SudokuWarper:
         thresholded = cv.adaptiveThreshold(gray, self.maxValue, cv.ADAPTIVE_THRESH_GAUSSIAN_C,
                                            cv.THRESH_BINARY, 11, 2)
         kernel = np.ones((5,5))
-        
-        thresholded = cv.erode(thresholded, kernel, iterations = 1)
-        thresholded = cv.dilate(thresholded, kernel, iterations = 1)
-        thresholded = cv.erode(thresholded, kernel, iterations = 1)
-        thresholded = cv.dilate(thresholded, kernel, iterations = 1)
+
+        for i in range(2):
+            thresholded = cv.erode(thresholded, kernel, iterations = 1)
+            thresholded = cv.dilate(thresholded, kernel, iterations = 1)
 
         edges = cv.Canny(thresholded,0, 255)
         contours, _ = cv.findContours(edges, cv.RETR_LIST, cv.CHAIN_APPROX_SIMPLE)

@@ -6,21 +6,8 @@ import pytesseract
 import sudoku_warper, utils
 
 
-thr_min, thr_max = 130,  255
-kernel = np.ones((3, 3), np.uint8)
-
-def findMaxContour(contours):
-    if len(contours) == 0:
-        return None
-    else:
-        maxContourArea = -1
-        maxContour = contours[0]
-        for c in contours:
-            if cv.contourArea(c) > maxContourArea:
-                maxContourArea = cv.contourArea(c)
-                maxContour = c
-        return maxContour
-
+THR_MIN, THR_MAX = 130,  255
+KERNEL = np.ones((3, 3), np.uint8)
    
 def getWarpedImage(image, contour):
     peri = cv.arcLength(contour, True)
@@ -57,25 +44,26 @@ def getWarpedImage(image, contour):
 
 
 def getAvgLuminance(image):
-    sigma = np.average(image)
-    return  sigma
+    x, y = image.shape[1], image.shape[0]
+    sigma = np.average(image[x//4:(3*x)//4, y//5:(4*x)//5])
+    return sigma
 
 
 def getNoGridBoard(image, contours, kernel):
-    global thr_min, thr_max
+    global THR_MIN, THR_MAX
     cells = []
     whitespaces = []
     for c in contours[::-1]:
         warpedCell = getWarpedImage(image, c)
         warpedCell = cv.resize(warpedCell, (200, 200))
         warpedCell = utils.deleteEdges(warpedCell, 20, 20)
-        _, warpedCell = cv.threshold(warpedCell, thr_min, thr_max, cv.THRESH_BINARY)
+        _, warpedCell = cv.threshold(warpedCell, THR_MIN, THR_MAX, cv.THRESH_BINARY)
         warpedCell = cv.erode(warpedCell, kernel, iterations = 1)
         warpedCell = cv.dilate(warpedCell, kernel, iterations = 1)
         print(getAvgLuminance(warpedCell))
         cv.imshow("CELL", warpedCell)
         cv.waitKey(2)
-        if getAvgLuminance(warpedCell) < (thr_max - 12):
+        if getAvgLuminance(warpedCell) < (THR_MAX - 12):
             whitespaces.append(1)
             cells.append(warpedCell)
         else:
@@ -115,7 +103,7 @@ def filterContours(contours, numberOfContours, deviation):
 
 
 def main():
-    global thr_min, thr_max, kernel
+    global THR_MIN, THR_MAX, KERNEL
 
     parser = argparse.ArgumentParser()
     parser.add_argument('--file', dest='imgFile', required=True, help='path to the input image')
